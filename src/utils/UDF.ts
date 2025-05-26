@@ -108,7 +108,8 @@ class UDF {
         data_status: 'streaming',
       }));
 
-      this.allSymbols = new Set(this.symbols.map((pair: any) => pair.id));
+      this.allSymbols = new Set(this.symbols.map((pair: any) => pair.symbol));
+      
     } catch (error) {
       console.log(error);
     }
