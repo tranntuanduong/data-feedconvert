@@ -61,7 +61,7 @@ class UDF {
     this.candlesClient = new ApolloClient({
       link: new HttpLink({
         fetch,
-        uri: `${process.env.GRAPH_CLIENT}/subgraphs/name/graphprotocol/u2uswap-dexcandles`,
+        uri: `${process.env.GRAPH_CLIENT}`,
       }),
       cache: new InMemoryCache(),
     });
@@ -79,7 +79,6 @@ class UDF {
         },
         fetchPolicy: 'cache-first',
       });
-
 
       this.symbols = pairs.map((pair: any) => ({
         symbol: pair.id,
