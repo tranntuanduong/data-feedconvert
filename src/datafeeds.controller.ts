@@ -38,7 +38,8 @@ export class DatafeedsController {
   @Get('history')
   async getHistory(@Query() query: any) {
     try {
-      const { symbol, from, to, resolution, countback } = query;
+      const { symbol, from, to, resolution, countback: _countback } = query;
+      const countback = _countback || 1000;
       await UDF.loadSymbols();
       const history = await UDF.history(
         String(symbol).toLocaleLowerCase(),

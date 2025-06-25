@@ -90,8 +90,8 @@ class UDF {
         token0Decimals: 18,
         token1Decimals: 18,
         description: `${pair.token0}/${pair.token1}`,
-        exchange: 'U2USWAP',
-        listed_exchange: 'U2USWAP',
+        exchange: 'FIRESTARTER',
+        listed_exchange: 'FIRESTARTER',
         type: 'crypto',
         currency_code: pair.token1,
         session: '24x7',
@@ -109,7 +109,6 @@ class UDF {
       }));
 
       this.allSymbols = new Set(this.symbols.map((pair: any) => pair.symbol));
-      
     } catch (error) {
       console.log(error);
     }
@@ -164,15 +163,15 @@ class UDF {
       throw new Error('Symbol not found');
     }
     const data = this.symbols.find((value: any) => value.symbol === symbol);
-    const RESOLUTIONS_INTERVALS_MAP: Record<string, number> = {
-      5: 60 * 5,
-      15: 60 * 15,
-      60: 60 * 60,
-      240: 60 * 60 * 4,
-      '1D': 60 * 60 * 24,
-      '7D': 60 * 60 * 24 * 7,
-    };
-    const interval: number = RESOLUTIONS_INTERVALS_MAP[resolution];
+    // const RESOLUTIONS_INTERVALS_MAP: Record<string, number> = {
+    //   5: 60 * 5,
+    //   15: 60 * 15,
+    //   60: 60 * 60,
+    //   240: 60 * 60 * 4,
+    //   '1D': 60 * 60 * 24,
+    //   '7D': 60 * 60 * 24 * 7,
+    // };
+    const interval: number = +resolution;
     if (!interval) {
       throw new Error('Invalid resolution');
     }
@@ -204,45 +203,49 @@ class UDF {
         return { s: 'no_data' };
       } else {
         const BIG_10_18 = new BigNumber(10).pow(18);
+        const times = totalCandles.map((c: any) => c.time);
+        const opens = [
+          new BigNumber(totalCandles[0].open)
+            .multipliedBy(BIG_TOKEN_0)
+            .dividedBy(BIG_TOKEN_1)
+            .toFixed(12),
+        ].concat(
+          totalCandles
+            .map((c: any) =>
+              new BigNumber(c.close)
+                .multipliedBy(BIG_TOKEN_0)
+                .dividedBy(BIG_TOKEN_1)
+                .toFixed(12),
+            )
+            .slice(0, totalCandles.length - 2),
+        );
+        const closes = totalCandles.map((c: any) =>
+          new BigNumber(c.close)
+            .multipliedBy(BIG_TOKEN_0)
+            .dividedBy(BIG_TOKEN_1)
+            .toFixed(12),
+        );
+        const highs = totalCandles.map((c: any) =>
+          new BigNumber(c.high)
+            .multipliedBy(BIG_TOKEN_0)
+            .dividedBy(BIG_TOKEN_1)
+            .toFixed(12),
+        );
+        const lows = totalCandles.map((c: any) =>
+          new BigNumber(c.low)
+            .multipliedBy(BIG_TOKEN_0)
+            .dividedBy(BIG_TOKEN_1)
+            .toFixed(12),
+        );
+
         return {
-          s: 'ok',
-          t: totalCandles.map((c: any) => c.time),
-          o: [
-            new BigNumber(totalCandles[0].open)
-              .multipliedBy(BIG_TOKEN_0)
-              .dividedBy(BIG_TOKEN_1)
-              .toJSON(),
-          ].concat(
-            totalCandles
-              .map((c: any) =>
-                new BigNumber(c.close)
-                  .multipliedBy(BIG_TOKEN_0)
-                  .dividedBy(BIG_TOKEN_1)
-                  .toJSON(),
-              )
-              .slice(0, totalCandles.length - 2),
-          ),
-          c: totalCandles.map((c: any) =>
-            new BigNumber(c.close)
-              .multipliedBy(BIG_TOKEN_0)
-              .dividedBy(BIG_TOKEN_1)
-              .toJSON(),
-          ),
-          h: totalCandles.map((c: any) =>
-            new BigNumber(c.high)
-              .multipliedBy(BIG_TOKEN_0)
-              .dividedBy(BIG_TOKEN_1)
-              .toJSON(),
-          ),
-          l: totalCandles.map((c: any) =>
-            new BigNumber(c.low)
-              .multipliedBy(BIG_TOKEN_0)
-              .dividedBy(BIG_TOKEN_1)
-              .toJSON(),
-          ),
-          v: totalCandles.map((c: any) =>
-            new BigNumber(c.token1TotalAmount).div(BIG_10_18).toJSON(),
-          ),
+          data: times.map((time, index) => ({
+            time,
+            o: 1 / +opens[index],
+            h: 1 / +highs[index],
+            l: 1 / +lows[index],
+            c: 1 / +closes[index],
+          })),
         };
       }
     }
