@@ -13,7 +13,7 @@ async function bootstrap() {
   });
   await app.listen(process.env.PORT ?? 3000).then(() => {
     console.log(
-      `Server is running on link http://localhost:${process.env.PORT ?? 3000}`,
+      `Server is running on linkx http://localhost:${process.env.PORT ?? 3000}`,
     );
   });
 }
