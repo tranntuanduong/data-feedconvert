@@ -241,10 +241,10 @@ class UDF {
         return {
           data: times.map((time, index) => ({
             time,
-            o: 1 / +opens[index],
-            h: 1 / +highs[index],
-            l: 1 / +lows[index],
-            c: 1 / +closes[index],
+            o: opens[index],
+            h: highs[index],
+            l: lows[index],
+            c: closes[index],
           })),
         };
       }
