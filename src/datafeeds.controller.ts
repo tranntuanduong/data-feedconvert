@@ -49,7 +49,6 @@ export class DatafeedsController {
         token0,
       } = query;
 
-      console.log("QUERY:::", query);
       const countback = _countback || 1000;
       await UDF.loadSymbols();
       const history = await UDF.history(
