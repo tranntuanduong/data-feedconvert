@@ -6,7 +6,9 @@ import { responseSuccess, responseError } from './utils/response';
 export class DatafeedsController {
   @Get()
   getIndex() {
-    return responseSuccess({ data: 'Welcome to the U2USwap UDF Adapter for TradingView.' });
+    return responseSuccess({
+      data: 'Welcome to the U2USwap UDF Adapter for TradingView.',
+    });
   }
 
   @Get('time')
@@ -38,7 +40,16 @@ export class DatafeedsController {
   @Get('history')
   async getHistory(@Query() query: any) {
     try {
-      const { symbol, from, to, resolution, countback: _countback } = query;
+      const {
+        symbol,
+        from,
+        to,
+        resolution,
+        countback: _countback,
+        token0,
+      } = query;
+
+      console.log("QUERY:::", query);
       const countback = _countback || 1000;
       await UDF.loadSymbols();
       const history = await UDF.history(
@@ -46,11 +57,12 @@ export class DatafeedsController {
         Number(from),
         Number(to),
         resolution,
-        Number(countback)
+        Number(countback),
       );
+
       return responseSuccess(history);
     } catch (error) {
       return responseError((error as Error).message);
     }
   }
-} 
+}

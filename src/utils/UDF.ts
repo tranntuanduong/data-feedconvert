@@ -163,14 +163,7 @@ class UDF {
       throw new Error('Symbol not found');
     }
     const data = this.symbols.find((value: any) => value.symbol === symbol);
-    // const RESOLUTIONS_INTERVALS_MAP: Record<string, number> = {
-    //   5: 60 * 5,
-    //   15: 60 * 15,
-    //   60: 60 * 60,
-    //   240: 60 * 60 * 4,
-    //   '1D': 60 * 60 * 24,
-    //   '7D': 60 * 60 * 24 * 7,
-    // };
+
     const interval: number = +resolution;
     if (!interval) {
       throw new Error('Invalid resolution');
@@ -181,6 +174,9 @@ class UDF {
     let totalCandles: any[] = [];
     const token0 = data.token0;
     const token1 = data.token1;
+
+    console.log('data:::', data);
+
     const BIG_TOKEN_0 = new BigNumber(10).pow(18 - data.token0Decimals);
     const BIG_TOKEN_1 = new BigNumber(10).pow(18 - data.token1Decimals);
     while (true) {
@@ -198,54 +194,118 @@ class UDF {
         },
         fetchPolicy: 'cache-first',
       });
+
       totalCandles = totalCandles.concat(candles);
+
+      // if (totalCandles.length === 0) {
+      //   return { s: 'no_data' };
+      // } else {
+      //   const BIG_10_18 = new BigNumber(10).pow(18);
+      //   const times = totalCandles.map((c: any) => c.time);
+      //   const opens = [
+      //     new BigNumber(totalCandles[0].open)
+      //       .multipliedBy(BIG_TOKEN_0)
+      //       .dividedBy(BIG_TOKEN_1)
+      //       .toFixed(12),
+      //   ].concat(
+      //     totalCandles
+      //       .map((c: any) =>
+      //         new BigNumber(c.close)
+      //           .multipliedBy(BIG_TOKEN_0)
+      //           .dividedBy(BIG_TOKEN_1)
+      //           .toFixed(12),
+      //       )
+      //       .slice(0, totalCandles.length - 2),
+      //   );
+      //   const closes = totalCandles.map((c: any) =>
+      //     new BigNumber(c.close)
+      //       .multipliedBy(BIG_TOKEN_0)
+      //       .dividedBy(BIG_TOKEN_1)
+      //       .toFixed(12),
+      //   );
+      //   const highs = totalCandles.map((c: any) =>
+      //     new BigNumber(c.high)
+      //       .multipliedBy(BIG_TOKEN_0)
+      //       .dividedBy(BIG_TOKEN_1)
+      //       .toFixed(12),
+      //   );
+      //   const lows = totalCandles.map((c: any) =>
+      //     new BigNumber(c.low)
+      //       .multipliedBy(BIG_TOKEN_0)
+      //       .dividedBy(BIG_TOKEN_1)
+      //       .toFixed(12),
+      //   );
+
+      //   // trigger
+      //   return {
+      //     data: times.map((time, index) => ({
+      //       time,
+      //       o: opens[index],
+      //       h: highs[index],
+      //       l: lows[index],
+      //       c: closes[index],
+      //     })),
+      //   };
+      // }
       if (totalCandles.length === 0) {
         return { s: 'no_data' };
       } else {
         const BIG_10_18 = new BigNumber(10).pow(18);
-        const times = totalCandles.map((c: any) => c.time);
-        const opens = [
-          new BigNumber(totalCandles[0].open)
+        const s = 'ok';
+        const t = totalCandles.map((c: any) => c.time);
+        const o = [
+          new BigNumber(1)
+            .dividedBy(totalCandles[0].open)
             .multipliedBy(BIG_TOKEN_0)
             .dividedBy(BIG_TOKEN_1)
-            .toFixed(12),
+            .toJSON(),
         ].concat(
           totalCandles
             .map((c: any) =>
-              new BigNumber(c.close)
+              new BigNumber(1)
+                .dividedBy(c.close)
                 .multipliedBy(BIG_TOKEN_0)
                 .dividedBy(BIG_TOKEN_1)
-                .toFixed(12),
+                .toJSON(),
             )
             .slice(0, totalCandles.length - 2),
         );
-        const closes = totalCandles.map((c: any) =>
-          new BigNumber(c.close)
+        const c = totalCandles.map((c: any) =>
+          new BigNumber(1)
+            .dividedBy(c.close)
             .multipliedBy(BIG_TOKEN_0)
             .dividedBy(BIG_TOKEN_1)
-            .toFixed(12),
+            .toJSON(),
         );
-        const highs = totalCandles.map((c: any) =>
-          new BigNumber(c.high)
+        const h = totalCandles.map((c: any) =>
+          new BigNumber(1)
+            .dividedBy(c.high)
             .multipliedBy(BIG_TOKEN_0)
             .dividedBy(BIG_TOKEN_1)
-            .toFixed(12),
+            .toJSON(),
         );
-        const lows = totalCandles.map((c: any) =>
-          new BigNumber(c.low)
+        const l = totalCandles.map((c: any) =>
+          new BigNumber(1)
+            .dividedBy(c.low)
             .multipliedBy(BIG_TOKEN_0)
             .dividedBy(BIG_TOKEN_1)
-            .toFixed(12),
+            .toJSON(),
+        );
+        const v = totalCandles.map((c: any) =>
+          new BigNumber(c.token1TotalAmount).div(BIG_10_18).toJSON(),
         );
 
+        const response = t.map((time, index) => ({
+          time,
+          o: o[index],
+          h: h[index],
+          l: l[index],
+          c: c[index],
+        }));
+
         return {
-          data: times.map((time, index) => ({
-            time,
-            o: opens[index],
-            h: highs[index],
-            l: lows[index],
-            c: closes[index],
-          })),
+          data: response,
+          s,
         };
       }
     }
