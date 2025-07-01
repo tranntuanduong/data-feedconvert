@@ -175,8 +175,6 @@ class UDF {
     const token0 = data.token0;
     const token1 = data.token1;
 
-    console.log('data:::', data);
-
     const BIG_TOKEN_0 = new BigNumber(10).pow(18 - data.token0Decimals);
     const BIG_TOKEN_1 = new BigNumber(10).pow(18 - data.token1Decimals);
     while (true) {
@@ -301,6 +299,7 @@ class UDF {
           h: h[index],
           l: l[index],
           c: c[index],
+          v: v[index],
         }));
 
         return {
