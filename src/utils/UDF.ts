@@ -121,6 +121,7 @@ class UDF {
         fetchPolicy: 'cache-first',
       });
 
+      // delete cache
       this.symbols = pairs.map((pair: any) => ({
         symbol: pair.id,
         ticker: pair.id,
