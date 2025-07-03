@@ -51,8 +51,40 @@ const GET_CANDLES = gql`
   }
 `;
 
+const GET_TRANSACTIONS = gql`
+  query MyQuery($pair: String!) {
+    transactions(
+      where: { swaps_: { pair: $pair } }
+      orderBy: timestamp
+      orderDirection: desc
+    ) {
+      timestamp
+      swaps {
+        amount0In
+        amount0Out
+        amount1In
+        amount1Out
+        pair {
+          token0 {
+            symbol
+            id
+          }
+          token1 {
+            symbol
+            id
+          }
+          name
+          id
+        }
+      }
+      id
+    }
+  }
+`;
+
 class UDF {
   private candlesClient: ApolloClient<NormalizedCacheObject>;
+  private transactionsClient: ApolloClient<NormalizedCacheObject>;
   private supportedResolutions: string[];
   private symbols: any[] = [];
   private allSymbols = new Set<string>();
@@ -65,6 +97,15 @@ class UDF {
       }),
       cache: new InMemoryCache(),
     });
+
+    this.transactionsClient = new ApolloClient({
+      link: new HttpLink({
+        fetch,
+        uri: `${process.env.GRAPH_CLIENT_TRANSACTIONS}`,
+      }),
+      cache: new InMemoryCache(),
+    });
+
     this.supportedResolutions = ['5', '15', '60', '240', '1D', '7D'];
   }
 
@@ -159,6 +200,7 @@ class UDF {
     countback: number,
   ) {
     const hasSymbol = this.checkSymbol(symbol);
+
     if (!hasSymbol) {
       throw new Error('Symbol not found');
     }
@@ -190,7 +232,8 @@ class UDF {
           token1,
           limit: countback,
         },
-        fetchPolicy: 'cache-first',
+        // fetchPolicy: 'cache-first',
+        fetchPolicy: 'no-cache',
       });
 
       totalCandles = totalCandles.concat(candles);
@@ -308,6 +351,34 @@ class UDF {
         };
       }
     }
+  }
+
+  public async transactions(symbol: string, from: number, to: number) {
+    const {
+      data: { transactions: transactionsData },
+    } = await this.transactionsClient.query({
+      query: GET_TRANSACTIONS,
+      variables: {
+        pair: symbol.toLocaleLowerCase(),
+      },
+      fetchPolicy: 'no-cache',
+    });
+
+    const transactions = transactionsData.map((item: any) => {
+      const swapItem = item?.swaps?.[0] ?? {};
+
+      const isBuy = swapItem.amount0In === '0';
+
+      return {
+        timestamp: item.timestamp,
+        txHash: item.id,
+        isBuy,
+        baseAmount: isBuy ? swapItem.amount0Out : swapItem.amount0In,
+        quoteAmount: isBuy ? swapItem.amount1In : swapItem.amount1Out,
+      };
+    });
+
+    return transactions;
   }
 }
 

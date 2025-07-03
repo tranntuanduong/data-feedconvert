@@ -66,4 +66,22 @@ export class DatafeedsController {
       return responseError((error as Error).message);
     }
   }
+
+  @Get("transactions")
+  async getTransactions(@Query() query: any) {
+    try {
+      const { symbol, from, to } = query;
+      await UDF.loadSymbols();
+      const transactions = await UDF.transactions(
+        String(symbol).toLocaleLowerCase(),
+        Number(from),
+        Number(to),
+      );
+
+      return transactions;
+      // return responseSuccess(transactions);
+    } catch (error) {
+      return responseError((error as Error).message);
+    }
+  }
 }
