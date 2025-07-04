@@ -239,56 +239,6 @@ class UDF {
 
       totalCandles = totalCandles.concat(candles);
 
-      // if (totalCandles.length === 0) {
-      //   return { s: 'no_data' };
-      // } else {
-      //   const BIG_10_18 = new BigNumber(10).pow(18);
-      //   const times = totalCandles.map((c: any) => c.time);
-      //   const opens = [
-      //     new BigNumber(totalCandles[0].open)
-      //       .multipliedBy(BIG_TOKEN_0)
-      //       .dividedBy(BIG_TOKEN_1)
-      //       .toFixed(12),
-      //   ].concat(
-      //     totalCandles
-      //       .map((c: any) =>
-      //         new BigNumber(c.close)
-      //           .multipliedBy(BIG_TOKEN_0)
-      //           .dividedBy(BIG_TOKEN_1)
-      //           .toFixed(12),
-      //       )
-      //       .slice(0, totalCandles.length - 2),
-      //   );
-      //   const closes = totalCandles.map((c: any) =>
-      //     new BigNumber(c.close)
-      //       .multipliedBy(BIG_TOKEN_0)
-      //       .dividedBy(BIG_TOKEN_1)
-      //       .toFixed(12),
-      //   );
-      //   const highs = totalCandles.map((c: any) =>
-      //     new BigNumber(c.high)
-      //       .multipliedBy(BIG_TOKEN_0)
-      //       .dividedBy(BIG_TOKEN_1)
-      //       .toFixed(12),
-      //   );
-      //   const lows = totalCandles.map((c: any) =>
-      //     new BigNumber(c.low)
-      //       .multipliedBy(BIG_TOKEN_0)
-      //       .dividedBy(BIG_TOKEN_1)
-      //       .toFixed(12),
-      //   );
-
-      //   // trigger
-      //   return {
-      //     data: times.map((time, index) => ({
-      //       time,
-      //       o: opens[index],
-      //       h: highs[index],
-      //       l: lows[index],
-      //       c: closes[index],
-      //     })),
-      //   };
-      // }
       if (totalCandles.length === 0) {
         return { s: 'no_data' };
       } else {
