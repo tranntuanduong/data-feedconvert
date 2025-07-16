@@ -52,9 +52,11 @@ const GET_CANDLES = gql`
 `;
 
 const GET_TRANSACTIONS = gql`
-  query MyQuery($pair: String!) {
+  query MyQuery($pair: String!, $skip: Int!, $limit: Int!) {
     transactions(
       where: { swaps_: { pair: $pair } }
+      first: $limit
+      skip: $skip
       orderBy: timestamp
       orderDirection: desc
     ) {
@@ -321,13 +323,15 @@ class UDF {
     }
   }
 
-  public async transactions(symbol: string, from: number, to: number) {
+  public async transactions(symbol: string, skip: number, limit: number) {
     const {
       data: { transactions: transactionsData },
     } = await this.transactionsClient.query({
       query: GET_TRANSACTIONS,
       variables: {
         pair: symbol.toLowerCase(),
+        skip,
+        limit,
       },
       fetchPolicy: 'no-cache',
     });

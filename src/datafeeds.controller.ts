@@ -68,12 +68,12 @@ export class DatafeedsController {
   @Get('transactions')
   async getTransactions(@Query() query: any) {
     try {
-      const { symbol, from, to } = query;
+      const { symbol, skip, limit } = query;
       await UDF.loadSymbols();
       const transactions = await UDF.transactions(
         String(symbol).toLowerCase(),
-        Number(from),
-        Number(to),
+        Number(skip),
+        Number(limit),
       );
 
       return transactions;
