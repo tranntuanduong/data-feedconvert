@@ -82,6 +82,23 @@ const GET_TRANSACTIONS = gql`
   }
 `;
 
+const GET_PAIR_BY_TOKENS = gql`
+  query MyQuery($token0: String!, $token1: String!) {
+    pairs(
+      where: {
+        or: [
+          { and: [{ token0: $token0 }, { token1: $token1 }] }
+          { and: [{ token0: $token1 }, { token1: $token0 }] }
+        ]
+      }
+    ) {
+      id
+      token0
+      token1
+    }
+  }
+`;
+
 class UDF {
   private candlesClient: ApolloClient<NormalizedCacheObject>;
   private transactionsClient: ApolloClient<NormalizedCacheObject>;
@@ -310,7 +327,7 @@ class UDF {
     } = await this.transactionsClient.query({
       query: GET_TRANSACTIONS,
       variables: {
-        pair: symbol.toLocaleLowerCase(),
+        pair: symbol.toLowerCase(),
       },
       fetchPolicy: 'no-cache',
     });
@@ -330,6 +347,28 @@ class UDF {
     });
 
     return transactions;
+  }
+
+  public async pairAddress(token0: string, token1: string) {
+    const {
+      data: { pairs },
+    } = await this.candlesClient.query({
+      query: GET_PAIR_BY_TOKENS,
+      variables: {
+        token0: token0.toLowerCase(),
+        token1: token1.toLowerCase(),
+      },
+    });
+
+    const pair = pairs[0];
+
+    return {
+      pairInfo: {
+        token0: pair.token0,
+        token1: pair.token1,
+        pairAddress: pair.id,
+      },
+    };
   }
 }
 

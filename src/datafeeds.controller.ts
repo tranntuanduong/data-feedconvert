@@ -30,7 +30,7 @@ export class DatafeedsController {
   async getSymbols(@Query('symbol') symbol: string) {
     try {
       await UDF.loadSymbols();
-      const symbolDetails = await UDF.symbol(symbol?.toLocaleLowerCase());
+      const symbolDetails = await UDF.symbol(symbol?.toLowerCase());
       return responseSuccess(symbolDetails);
     } catch (error) {
       return responseError((error as Error).message);
@@ -52,14 +52,12 @@ export class DatafeedsController {
       const countback = _countback || 1000;
       await UDF.loadSymbols();
       const history = await UDF.history(
-        String(symbol).toLocaleLowerCase(),
+        String(symbol).toLowerCase(),
         Number(from),
         Number(to),
         resolution,
         Number(countback),
       );
-
-      
 
       return responseSuccess(history);
     } catch (error) {
@@ -67,19 +65,33 @@ export class DatafeedsController {
     }
   }
 
-  @Get("transactions")
+  @Get('transactions')
   async getTransactions(@Query() query: any) {
     try {
       const { symbol, from, to } = query;
       await UDF.loadSymbols();
       const transactions = await UDF.transactions(
-        String(symbol).toLocaleLowerCase(),
+        String(symbol).toLowerCase(),
         Number(from),
         Number(to),
       );
 
-      console.log('testcache');
       return transactions;
+    } catch (error) {
+      return responseError((error as Error).message);
+    }
+  }
+
+  @Get('pair-info')
+  async getPairAddress(@Query() query: any) {
+    try {
+      const { token0, token1 } = query;
+      await UDF.loadSymbols();
+      const pairAddress = await UDF.pairAddress(
+        String(token0).toLowerCase(),
+        String(token1).toLowerCase(),
+      );
+      return responseSuccess(pairAddress);
     } catch (error) {
       return responseError((error as Error).message);
     }
