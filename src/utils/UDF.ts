@@ -95,8 +95,16 @@ const GET_PAIR_BY_TOKENS = gql`
       }
     ) {
       id
-      token0
-      token1
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
     }
   }
 `;
@@ -356,7 +364,7 @@ class UDF {
   public async pairAddress(token0: string, token1: string) {
     const {
       data: { pairs },
-    } = await this.candlesClient.query({
+    } = await this.transactionsClient.query({
       query: GET_PAIR_BY_TOKENS,
       variables: {
         token0: token0.toLowerCase(),
@@ -368,9 +376,11 @@ class UDF {
 
     return {
       pairInfo: {
-        token0: pair.token0,
-        token1: pair.token1,
+        token0: pair.token0.id,
+        token1: pair.token1.id,
         pairAddress: pair.id,
+        token0Symbol: pair.token0.symbol,
+        token1Symbol: pair.token1.symbol,
       },
     };
   }
