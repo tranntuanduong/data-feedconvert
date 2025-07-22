@@ -374,6 +374,7 @@ class UDF {
 
     const pair = pairs[0];
 
+    // trigger build
     return {
       pairInfo: {
         token0: pair.token0.id,
