@@ -261,7 +261,7 @@ class UDF {
           limit: countback,
         },
         // fetchPolicy: 'cache-first',
-        fetchPolicy: 'no-cache',
+        fetchPolicy: 'network-only',
       });
 
       totalCandles = totalCandles.concat(candles);
@@ -341,7 +341,7 @@ class UDF {
         skip,
         limit,
       },
-      fetchPolicy: 'no-cache',
+      fetchPolicy: 'network-only',
     });
 
     const transactions = transactionsData.map((item: any) => {
