@@ -136,6 +136,7 @@ class UDF {
     this.supportedResolutions = ['5', '15', '60', '240', '1D', '7D'];
   }
 
+  // trigger
   public async loadSymbols() {
     try {
       const {
